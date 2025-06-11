@@ -1,0 +1,6 @@
+[submodule "TaRDIS-DCR-Editor"]
+	path = TaRDIS-DCR-Editor
+	url = https://github.com/DCR-NOVALINCS/TaRDIS-DCR-Editor
+[submodule "TaRDIS-DCR-Compiler"]
+	path = TaRDIS-DCR-Compiler
+	url = https://github.com/DCR-NOVALINCS/TaRDIS-DCR-Compiler
