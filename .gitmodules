@@ -4,3 +4,6 @@
 [submodule "TaRDIS-DCR-Compiler"]
 	path = TaRDIS-DCR-Compiler
 	url = https://github.com/DCR-NOVALINCS/TaRDIS-DCR-Compiler
+[submodule "TaRDIS-DCR-Runtime"]
+	path = TaRDIS-DCR-Runtime
+	url = https://github.com/DCR-NOVALINCS/TaRDIS-DCR-Runtime
