@@ -1,66 +1,78 @@
-export interface ValueDTO {
+interface ValueDTO {
     type: string;
     value: any;
 }
-export interface UnitDTO extends ValueDTO {
+interface UnitDTO extends ValueDTO {
     type: "Unit";
     value: undefined;
 }
-export interface BooleanDTO extends ValueDTO {
+interface BooleanDTO extends ValueDTO {
     type: "Boolean";
     value: boolean;
 }
-export interface IntDTO extends ValueDTO {
-    type: "Integer";
+interface IntDTO extends ValueDTO {
+    type: "Number";
     value: number;
 }
-export interface StringDTO extends ValueDTO {
+interface StringDTO extends ValueDTO {
     type: "String";
     value: string;
 }
-export interface RecordDTO extends ValueDTO {
+interface RecordDTO extends ValueDTO {
     type: "Record";
     value: { [key: string]: ValueDTO }
+
 }
 
-export interface TypeDTO { type: string }
-export interface UnitTypeDTO extends TypeDTO { }
-export interface BooleanTypeDTO extends TypeDTO { }
-export interface StringTypeDTO extends TypeDTO { }
-export interface IntTypeDTO extends TypeDTO { }
-export interface RefTypeDTO extends TypeDTO { } //TODO: Check this type
+interface TypeDTO { type: string }
+interface UnitTypeDTO extends TypeDTO { }
+interface BooleanTypeDTO extends TypeDTO { }
+interface StringTypeDTO extends TypeDTO { }
+interface IntTypeDTO extends TypeDTO { }
+interface RefTypeDTO extends TypeDTO { } //TODO: Check this type
 
-export interface RecordTypeDTO extends TypeDTO {
+interface RecordTypeDTO extends TypeDTO {
     fields: { [key: string]: TypeDTO }
 }
-export interface DCREventDTO {
+
+interface SelfDTO {
+    role: string;
+    params: { [key: string]: ValueDTO };
+
+}
+
+// interface EndpointDTO {
+
+// }
+interface DCREventDTO {
     id: string;
+    label:string;
     action: string;
     kind: KindDTO;
     initiator: string;
     typeExpr: TypeDTO;
     marking: MarkingDTO;
 }
-export interface InteractionEventDTO extends DCREventDTO {
+interface InteractionEventDTO extends DCREventDTO {
     receivers: Iterable<string>;
 }
-export interface MarkingDTO {
+interface MarkingDTO {
     executed: boolean;
     pending: boolean;
     included: boolean;
     value: ValueDTO;
 }
-export interface RelationDTO {
+interface RelationDTO {
     from: string;
     guard: ValueDTO;
     type: RelationType;
 }
 
-export interface ControlRelationDTO extends RelationDTO {
+interface ControlRelationDTO extends RelationDTO {
     to: string;
 }
 
-export interface SpawnRelationDTO extends RelationDTO {
+interface SpawnRelationDTO extends RelationDTO {
     graph: GraphDTO;
 }
 
@@ -68,27 +80,46 @@ export enum RelationType {
     INCLUDE = "include", EXCLUDE = "exclude", RESPONSE = "response", CONDITION = "condition", MILESTONE = "milestone"
 }
 
-export interface GraphDTO {
+// GraphDTO Interface
+interface GraphDTO {
     events: Array<DCREventDTO>;
     relations: Array<RelationDTO>;
 }
 
-type KindEvent = "computation" | "input"
-type TypeEvent = "send" | "action"
-export type KindDTO = `${KindEvent}-${TypeEvent}` | "receive" | "input-action" | "computation-send";
-
-export enum Kind {
+export enum KindDTO {
     COMPUTATION = "computation-action",
     INPUT_SEND = "input-send",
     RECEIVE = "receive",
     INPUT = "input-action",
     COMPUTATION_SEND =  "computation-send"
+
+
 }
 
-// export const KindDTOMap: Record<string, KindDTO> = {
-//     "computation-action": KindDTO.COMPUTATION,
-//     "input-send": KindDTO.INPUT_SEND,
-//     "receive": KindDTO.RECEIVE,
-//     "input-action": KindDTO.INPUT,
-//     "computation-send": KindDTO.COMPUTATION_SEND
-// };
+export const KindDTOMap: Record<string, KindDTO> = {
+    "computation-action": KindDTO.COMPUTATION,
+    "input-send": KindDTO.INPUT_SEND,
+    "receive": KindDTO.RECEIVE,
+    "input-action": KindDTO.INPUT,
+    "computation-send": KindDTO.COMPUTATION_SEND
+};
+
+export type {
+    ValueDTO, UnitDTO,
+    BooleanDTO, IntDTO, StringDTO, RecordDTO,
+    TypeDTO,
+    UnitTypeDTO,
+    BooleanTypeDTO,
+    StringTypeDTO,
+    IntTypeDTO,
+    RefTypeDTO,
+    RecordTypeDTO,
+    DCREventDTO,
+    InteractionEventDTO,
+    MarkingDTO,
+    RelationDTO,
+    ControlRelationDTO,
+    SpawnRelationDTO,
+    GraphDTO,
+    SelfDTO
+}
