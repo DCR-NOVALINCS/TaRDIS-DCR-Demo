@@ -26,7 +26,7 @@ const convertFormDataIntoValue = (formData: FormData, typeExpr:TypeDTO): ValueDT
     } else {
         let value: { [key: string]: ValueDTO } = {}
         let recordType = typeExpr as RecordTypeDTO;
-        let converter = input => {
+        let converter = (input:any) => {
             if (input === null || input === undefined) {
                 return  "" ;
             } else if (input === "true" || input === "false") {
