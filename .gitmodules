@@ -1,9 +1,12 @@
 [submodule "TaRDIS-DCR-Editor"]
 	path = TaRDIS-DCR-Editor
 	url = https://github.com/DCR-NOVALINCS/TaRDIS-DCR-Editor
+	ignore = dirty
 [submodule "TaRDIS-DCR-Compiler"]
 	path = TaRDIS-DCR-Compiler
 	url = https://github.com/DCR-NOVALINCS/TaRDIS-DCR-Compiler
+	ignore = dirty
 [submodule "TaRDIS-DCR-Runtime"]
 	path = TaRDIS-DCR-Runtime
 	url = https://github.com/DCR-NOVALINCS/TaRDIS-DCR-Runtime
+	ignore = dirty
