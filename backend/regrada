@@ -1,8 +1,0 @@
-P(id:Integer)
-Public
-;
-Public flows P
-;
-(e0:readDocument) (Public) [1+1==2] [P(id=1)]
-(e1:submit) (Public) [?] [P(id=1) -> P(id=2)]
-(e2:accept) (Public) [?] [P(id=2) -> P(id=1)]
