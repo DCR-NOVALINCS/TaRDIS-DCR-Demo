@@ -195,17 +195,17 @@ function App() {
       });
   }, [readyState, port]);
 
-  return (<div style={{ overflow: "scroll" }}>
+  return (
     <Card
       sx={{
         // padding: "1rem",
         "margin-top": "1rem",
         minWidth: 350,
         width: "100%",
-        // height: "calc(100vh - 2rem)",
-        height: "100%",
+        height: "calc(100vh - 2rem)",
         // maxWidth: "100%",
         boxSizing: "border-box",
+        overflowY: "auto",
       }}
       variant="outlined"
       
@@ -274,7 +274,6 @@ function App() {
         </Alert>
       </Snackbar>
     </Card>
-    </div>
   );
 }
 
