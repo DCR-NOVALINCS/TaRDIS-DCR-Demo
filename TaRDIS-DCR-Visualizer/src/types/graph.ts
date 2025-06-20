@@ -52,6 +52,7 @@ interface DCREventDTO {
     initiator: string;
     typeExpr: TypeDTO;
     marking: MarkingDTO;
+    timestamp: number;
 }
 interface InteractionEventDTO extends DCREventDTO {
     receivers: Iterable<string>;

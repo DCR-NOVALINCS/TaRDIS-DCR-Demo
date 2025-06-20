@@ -34,7 +34,6 @@ const convertFormDataIntoValue = (
   formData: FormData,
   typeExpr: TypeDTO
 ): ValueDTO => {
-  console.log("Converting form data into value", typeExpr);
   if (typeExpr.type !== "Record") {
     if (typeExpr.type === "Unit") {
       return { type: typeExpr.type, value: "" };
@@ -111,6 +110,7 @@ const InputEvent = ({
 
     let value = convertFormDataIntoValue(formData, event.typeExpr);
     let body = { eventID: event.id, value: value };
+    console.log("Executing input event", body);
     executeEvent(
       `http://${url}:${targetPort}/rest/dcr/events/${event.action}/${event.id}`,
       body

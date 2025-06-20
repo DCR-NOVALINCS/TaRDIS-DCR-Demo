@@ -178,33 +178,37 @@ function App() {
   );
 
   let [events, setEvents] = React.useState<DCREventDTO[]>(
-    lastEventMessage ? JSON.parse(lastEventMessage.data) : []
+    lastEventMessage ? 
+    JSON.parse(lastEventMessage.data)
+     : []
   );
 
   useEffect(() => {
     getEvents(`http://${url}:${port}/rest/dcr/events/enable`)
       .then((response) => response.json())
-      .then((data) => {
-        console.log("Events enabled:", data.events);
-      })
+      // .then((data) => {
+      //   console.log("Events enabled:", data.events);
+      // })
       .catch((error) => {
         console.error("Error enabling events:", error);
         // setEvents([]);
       });
   }, [readyState, port]);
 
-  return (
+  return (<div style={{ overflow: "scroll" }}>
     <Card
       sx={{
         // padding: "1rem",
         "margin-top": "1rem",
         minWidth: 350,
         width: "100%",
-        height: "calc(100vh - 2rem)",
+        // height: "calc(100vh - 2rem)",
+        height: "100%",
         // maxWidth: "100%",
         boxSizing: "border-box",
       }}
       variant="outlined"
+      
     >
       <Header self={self} port={{ value: port, set: setPort }} />
       {/* <Button
@@ -237,9 +241,15 @@ function App() {
             /*useFlexGap={true} display={"flex"}*/ alignItems="center"
             justifyContent="center"
           >
-            {events.map((event: DCREventDTO) => {
-              return <Event key={event.id} event={event} targetPort={port} />;
-            })}
+           
+          {events .sort(
+          ((a: DCREventDTO, b: DCREventDTO) =>{ 
+            if (a.timestamp < b.timestamp) return -1;
+            if (a.timestamp > b.timestamp) return 1;
+            return 0;
+          })).map((event: DCREventDTO) => {
+                  return <Event key={event.id} event={event} targetPort={port} />;
+                })}
           </Stack>
         )}
         {events.length == 0 && (
@@ -264,6 +274,7 @@ function App() {
         </Alert>
       </Snackbar>
     </Card>
+    </div>
   );
 }
 
