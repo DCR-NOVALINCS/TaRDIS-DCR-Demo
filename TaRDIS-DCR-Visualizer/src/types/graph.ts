@@ -53,10 +53,20 @@ interface DCREventDTO {
     typeExpr: TypeDTO;
     marking: MarkingDTO;
     timestamp: number;
+    receivers: UserSetValDTO;
 }
-interface InteractionEventDTO extends DCREventDTO {
-    receivers: Iterable<string>;
+interface UserSetValDTO {
+    userVals : Array<RoleValDTO>;
 }
+
+interface RoleValDTO {
+    role: string;
+    constrainedParams : { [key: string]: ValueDTO };
+    freeParams : Set<string>;
+}
+// interface InteractionEventDTO extends DCREventDTO {
+//     receivers: UserSetValDTO;
+// }
 interface MarkingDTO {
     executed: boolean;
     pending: boolean;
@@ -116,7 +126,9 @@ export type {
     RefTypeDTO,
     RecordTypeDTO,
     DCREventDTO,
-    InteractionEventDTO,
+    UserSetValDTO,
+    RoleValDTO,
+    // InteractionEventDTO,
     MarkingDTO,
     RelationDTO,
     ControlRelationDTO,

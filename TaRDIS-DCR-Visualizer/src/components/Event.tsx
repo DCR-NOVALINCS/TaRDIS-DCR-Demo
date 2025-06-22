@@ -8,6 +8,7 @@ import {
   ValueDTO,
   KindDTO,
   RecordDTO,
+  RoleValDTO,
 } from "../types/graph";
 import {
   Alert,
@@ -152,6 +153,32 @@ const InputEvent = ({
   );
 };
 
+const Receivers = ({event}: {event: DCREventDTO}) => {
+  const stringFy = (value: RoleValDTO): string => {
+    let params = value.constrainedParams;
+    let string = Object.entries(params)
+      .map(([key, val]) => `${key}: ${val.value}`).join(", ");
+    let freePrams = value.freeParams;
+    if (Array.of(freePrams).length != 0) {
+      return  `${value.role}(${Array.from(freePrams).map((v) => `${v}= *,`).join(" ")}${string})`;
+    }
+    return `${value.role}(${string})`;
+  }
+
+  if (event.receivers.userVals.length === 0) {
+    return <Typography variant="body2">No receivers</Typography>;
+  }
+  return (
+    <div>
+      {event.receivers.userVals.map((receiver, index) => (
+        <div key={index}> 
+          <Typography variant="body1">{stringFy(receiver)}</Typography>
+        </div>
+        ))
+      }
+    </div>
+  );
+}
 export default function Event({ event, targetPort }: EventProps) {
   // console.log ( KindDTO[event.kind] === KindDTO.INPUT_SEND );
   return (
@@ -163,7 +190,9 @@ export default function Event({ event, targetPort }: EventProps) {
         alignContent: "center",
       }}
     >
+     
       <CardContent style={{ alignSelf: "center" }}>
+      <Receivers event={event}></Receivers>
         {(event.kind === KindDTO.COMPUTATION ||
           event.kind === KindDTO.COMPUTATION_SEND) && (
           <ComputationEvent event={event} />
