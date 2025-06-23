@@ -35,10 +35,13 @@ const convertFormDataIntoValue = (
   formData: FormData,
   typeExpr: TypeDTO
 ): ValueDTO => {
+  console.log("Converting form data into value for type", typeExpr);
   if (typeExpr.type !== "Record") {
     if (typeExpr.type === "Unit") {
       return { type: typeExpr.type, value: "" };
     } else {
+      console.log(url);
+      // console.log("Form data
       return { type: typeExpr.type, value: formData.get("Value") };
     }
   } else {
@@ -108,7 +111,6 @@ const InputEvent = ({
     formEvent.preventDefault();
     const formData = new FormData(formEvent.currentTarget);
     // const formJson = Object.fromEntries((formData as any).entries());
-
     let value = convertFormDataIntoValue(formData, event.typeExpr);
     let body = { eventID: event.id, value: value };
     console.log("Executing input event", body);
