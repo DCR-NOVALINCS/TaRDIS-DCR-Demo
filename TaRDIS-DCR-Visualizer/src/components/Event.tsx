@@ -111,6 +111,7 @@ const InputEvent = ({
     formEvent.preventDefault();
     const formData = new FormData(formEvent.currentTarget);
     // const formJson = Object.fromEntries((formData as any).entries());
+    console.log("Form data", formData);
     let value = convertFormDataIntoValue(formData, event.typeExpr);
     let body = { eventID: event.id, value: value };
     console.log("Executing input event", body);
@@ -185,9 +186,13 @@ export default function Event({ event, targetPort }: EventProps) {
   // console.log ( KindDTO[event.kind] === KindDTO.INPUT_SEND );
   return (
     <Card
-      variant="outlined"
+      variant= {event.marking.pending ? "elevation" : "outlined"}
+
       style={{
         // maxWidth: "20rem",
+        // borderRadius: "1rem",
+        backgroundColor: event.marking.pending ? "#fbeaea": "#ffffff" ,
+        borderColor: event.marking.pending ?  "#fb1313": undefined,
         width: "100%",
         alignContent: "center",
       }}
