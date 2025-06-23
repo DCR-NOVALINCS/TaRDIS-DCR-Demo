@@ -184,15 +184,16 @@ const Receivers = ({event}: {event: DCREventDTO}) => {
 }
 export default function Event({ event, targetPort }: EventProps) {
   // console.log ( KindDTO[event.kind] === KindDTO.INPUT_SEND );
+  console.log("Event", event.marking);
   return (
     <Card
-      variant= {event.marking.pending ? "elevation" : "outlined"}
+      variant= {event.marking.isPending ? "elevation" : "outlined"}
 
       style={{
         // maxWidth: "20rem",
         // borderRadius: "1rem",
-        backgroundColor: event.marking.pending ? "#fbeaea": "#ffffff" ,
-        borderColor: event.marking.pending ?  "#fb1313": undefined,
+        backgroundColor: event.marking.isPending ?  "#fbeaea": "#ffffff",
+        borderColor: event.marking.isPending ?  "#fb1313": undefined,
         width: "100%",
         alignContent: "center",
       }}

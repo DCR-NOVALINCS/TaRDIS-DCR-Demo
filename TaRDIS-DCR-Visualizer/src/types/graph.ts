@@ -68,9 +68,9 @@ interface RoleValDTO {
 //     receivers: UserSetValDTO;
 // }
 interface MarkingDTO {
-    executed: boolean;
-    pending: boolean;
-    included: boolean;
+    hasExecuted: boolean;
+    isPending: boolean;
+    isIncluded: boolean;
     value: ValueDTO;
 }
 interface RelationDTO {
