@@ -33,7 +33,7 @@ const BasicField = ({ name }: { name: string | undefined }): JSX.Element => (
     margin="dense"
     id={name ? name : "value"}
     name={name ? name : "value"}
-    label={name ? name : "Value"}
+    label={name ? name : "value"}
     type="text"
     fullWidth
     variant="standard"
@@ -45,7 +45,8 @@ const Field = ({ name, type }: { name: string; type: any }): JSX.Element => {
   if (type.type !== "Record") {
     if (type.type === "Unit") {
       return <div></div>;
-    } else return <BasicField name={name} />;
+    } else 
+    return <BasicField name={name} />;
   } else {
     let recordType = type as RecordTypeDTO;
 
@@ -60,7 +61,7 @@ const Field = ({ name, type }: { name: string; type: any }): JSX.Element => {
 };
 
 const MyForm = ({ event }: { event: DCREventDTO }) => (
-  <Field key="" type={event.typeExpr} name={"Value"} />
+  <Field key="" type={event.typeExpr} name={"value"} />
 );
 
 export default function EventModal(props: EventModalProps) {
@@ -133,6 +134,7 @@ export function EventForm({
     e.preventDefault();
     const form = e.currentTarget;
     const validationErrors = validate(form);
+    // console.log("Validation errors:", validationErrors);
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length === 0) {
       executeInput(e);
@@ -145,7 +147,7 @@ export function EventForm({
       margin="dense"
       id={name ? name : "value"}
       name={name ? name : "value"}
-      label={name ? name : "Value"}
+      label={name ? name : "value"}
       type="text"
       fullWidth
       variant="standard"
@@ -172,7 +174,7 @@ export function EventForm({
   };
 
   const MyForm = ({ event }: { event: DCREventDTO }) => (
-    <Field key="" type={event.typeExpr} name={"Value"} />
+    <Field key="" type={event.typeExpr} name={"value"} />
   );
 
   return (
