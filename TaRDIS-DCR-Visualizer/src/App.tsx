@@ -34,7 +34,8 @@ import {
 } from "@mui/material";
 import logo from "./logo.png";
 import tardis_logo from "./tardis_logo.png";
-import { executeEvent, getEvents } from "./api/graph";
+import { Provider } from "react-redux";
+
 
 const url = window.location.hostname;
 
@@ -149,39 +150,40 @@ const Header = ({
   </Box>
 );
 
-function App() {
+function MainApp() {
   const [port, setPort] = useState<number>(1234);
   const [self, selfSet] = useState<SelfDTO | undefined>(undefined);
 
-  let { lastMessage: lastEventMessage, readyState } = useWebSocket(
-    `ws://${url}:${port}/dcr`,
-    {
-      onOpen: () => {
-        console.log("opened connection");
-      },
-      onClose: () => console.log("closed connection"),
-      onMessage: (msg) => {
-        // console.log("Received message", msg);
-        var message = JSON.parse(msg.data);
-        console.log(message);
-        selfSet(message.self || undefined);
-        setEvents(message.events || []);
-      },
-      reconnectInterval: 1000,
-      shouldReconnect: () => true,
-      onError: (e) => {
-        console.error(e);
-        selfSet(undefined);
-        setEvents([]);
-      },
-    }
-  );
+  // let { lastMessage: lastEventMessage, readyState } = useWebSocket(
+  //   `ws://${url}:${port}/dcr`,
+  //   {
+  //     onOpen: () => {
+  //       console.log("opened connection");
+  //     },
+  //     onClose: () => console.log("closed connection"),
+  //     onMessage: (msg) => {
+  //       // console.log("Received message", msg);
+  //       var message = JSON.parse(msg.data);
+  //       console.log(message);
+  //       selfSet(message.self || undefined);
+  //       setEvents(message.events || []);
 
-  let [events, setEvents] = React.useState<DCREventDTO[]>(
-    lastEventMessage ? 
-    JSON.parse(lastEventMessage.data)
-     : []
-  );
+  //     },
+  //     reconnectInterval: 1000,
+  //     shouldReconnect: () => true,
+  //     onError: (e) => {
+  //       console.error(e);
+  //       selfSet(undefined);
+  //       setEvents([]);
+  //     },
+  //   }
+  // );
+
+  // let [events, setEvents] = React.useState<DCREventDTO[]>(
+  //   lastEventMessage ? 
+  //   JSON.parse(lastEventMessage.data)
+  //    : []
+  // );
 
   useEffect(() => {
     getEvents(`http://${url}:${port}/rest/dcr/events/enable`)
@@ -276,5 +278,9 @@ function App() {
     </Card>
   );
 }
-
-export default App;
+const RdxApp = () => (
+  <Provider store={store}>
+    <MainApp />
+  </Provider>
+);
+export default RdxApp;
