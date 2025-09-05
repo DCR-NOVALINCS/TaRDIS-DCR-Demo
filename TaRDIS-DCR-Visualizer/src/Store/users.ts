@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { DCREventDTO, SelfDTO, ValueDTO } from "../types/graph";
-import { stat } from "fs";
 import { AppDispatch, State as RootState } from "./index";
 import useWebSocket from "react-use-websocket";
 
@@ -11,8 +10,8 @@ import useWebSocket from "react-use-websocket";
     ip: String,
     port: number,
     events: DCREventDTO[],
-    loading: boolean,
-    uploading: boolean,
+    // loading: boolean,
+    // uploading: boolean,
     connection: WebSocket | undefined
 }
 
@@ -21,6 +20,7 @@ export interface State {
     userFilter: SelfDTO | undefined;
     ip: String,
     port: number,
+    size: number
 }
 // const initialState: State = {
 //     self: undefined,
@@ -35,6 +35,7 @@ const initialState: State = {
     userFilter: undefined,
     ip: "localhost",
     port: 1234,
+    size:0
 }
 
 interface ResponseDTO{
@@ -56,6 +57,10 @@ export const slice = createSlice({
         }, 
         disconnect: (state, action: PayloadAction<string>) => {
           delete state.users[action.payload].connection;
+          state.size--;
+        },
+        setUserSize: (state) => {
+          state.size++;
         }
     }
 })

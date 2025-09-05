@@ -1,23 +1,15 @@
 import { useState } from "react";
 import {
-  Modal,
-  Box,
-  Typography,
-  Grid,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   TextField,
-  Snackbar,
 } from "@mui/material";
 import {
   DCREventDTO,
   RecordTypeDTO,
-  TypeDTO,
-  UnitTypeDTO,
 } from "../types/graph";
 import React from "react";
 

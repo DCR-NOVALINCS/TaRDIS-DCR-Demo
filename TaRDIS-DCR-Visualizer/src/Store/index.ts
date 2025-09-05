@@ -8,7 +8,7 @@ export const store = configureStore({
     },
     //TODO Remover isto para retirar os logs do redux.
     //FIXME: Temos de dar fix nisto
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat([logger]),
+    // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat([logger]),
 });
 
 export type State = ReturnType<typeof store.getState>

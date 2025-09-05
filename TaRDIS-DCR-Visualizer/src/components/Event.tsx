@@ -2,8 +2,6 @@ import React from "react";
 import {
   DCREventDTO,
   TypeDTO,
-  UnitTypeDTO,
-  BooleanTypeDTO,
   RecordTypeDTO,
   ValueDTO,
   KindDTO,
@@ -20,14 +18,14 @@ import {
 } from "@mui/material";
 import EventModal, { EventForm } from "./EventModal";
 import EventChip from "./EventChip";
-import { executeEvent } from "../api/graph";
+import { executeEvent } from "../Store/users";
 import { errorMessage, SnackMessage, successMessage } from "../api/snackbar";
 
 const url = window.location.hostname; //FIXME: This should not be here
 
 type EventProps = {
   event: DCREventDTO;
-  targetPort: number;
+  // targetPort: number;
   // targetIp: string
 };
 
@@ -95,10 +93,9 @@ const ComputationEvent = ({ event }: { event: DCREventDTO }) => (
 
 const InputEvent = ({
   event,
-  targetPort,
+ 
 }: {
   event: DCREventDTO;
-  targetPort: number;
 }) => {
   const [showSnackbar, setShowSnackbar] = React.useState<boolean>(false);
 
@@ -116,7 +113,7 @@ const InputEvent = ({
     let body = { eventID: event.id, value: value };
     console.log("Executing input event", body);
     executeEvent(
-      `http://${url}:${targetPort}/rest/dcr/events/${event.action}/${event.id}`,
+      `http://${url}:${1234}/rest/dcr/events/${event.action}/${event.id}`,
       body
     ).catch((error) => {
       console.error(error);
@@ -182,7 +179,7 @@ const Receivers = ({event}: {event: DCREventDTO}) => {
     </div>
   );
 }
-export default function Event({ event, targetPort }: EventProps) {
+export default function Event({ event }: EventProps) {
   // console.log ( KindDTO[event.kind] === KindDTO.INPUT_SEND );
   console.log("Event", event.marking);
   return (
@@ -207,7 +204,7 @@ export default function Event({ event, targetPort }: EventProps) {
         )}
         {(event.kind === KindDTO.INPUT ||
           event.kind === KindDTO.INPUT_SEND) && (
-          <InputEvent event={event} targetPort={targetPort} />
+          <InputEvent event={event}  />
         )}
       </CardContent>
     </Card>
