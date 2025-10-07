@@ -108,7 +108,7 @@ const InputEvent = ({
     formEvent.preventDefault();
     const formData = new FormData(formEvent.currentTarget);
     // const formJson = Object.fromEntries((formData as any).entries());
-    console.log("Form data", formData);
+    // console.log("Form data", formData);
     let value = convertFormDataIntoValue(formData, event.typeExpr);
     let body = { eventID: event.id, value: value };
     console.log("Executing input event", body);
@@ -181,7 +181,7 @@ const Receivers = ({event}: {event: DCREventDTO}) => {
 }
 export default function Event({ event }: EventProps) {
   // console.log ( KindDTO[event.kind] === KindDTO.INPUT_SEND );
-  console.log("Event", event.marking);
+  // console.log("Event", event.marking);
   return (
     <Card
       variant= {event.marking.isPending ? "elevation" : "outlined"}

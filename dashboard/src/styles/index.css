@@ -1,0 +1,13 @@
+/* html, */
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #fdfdfd;
+  /* flex-direction: column; */
+  justify-content: center;
+}

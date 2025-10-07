@@ -13,7 +13,11 @@ import {
   Container,
   Stack,
   Tab,
-  IconButton
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@mui/material";
 import { DCREventDTO, KindDTO } from "../types/graph";
 import Event from "../components/Event";
@@ -41,7 +45,15 @@ interface RowData {
 // }
 
 function MainApp() {
+  const [open, setOpen] = React.useState(false);
+  const [currentRow, setCurrentRow] = React.useState<number| undefined>(undefined);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
+  const handleClose = () => {
+    setOpen(false);
+  };
     const [rows, setRows] = useState<RowData[]>([
         { id: 1, ip:"localhost", port:1234, user: "Alice", events: [
           {
@@ -80,24 +92,24 @@ function MainApp() {
               userVals: []
             }
           },
-          {
-            id: "event1",
-            label: "Event_1",
-            action: "Action_1",
-            kind: KindDTO.INPUT_SEND,
-            initiator: "Alice",
-            typeExpr: { type: "Number" },
-            marking: {
-              hasExecuted: false,
-              isPending: true,
-              isIncluded: true,
-              value: { type: "Number", value: 1 }
-            },
-            timestamp: 0,
-            receivers: {
-              userVals: []
-            }
-          },
+          // {
+          //   id: "event1",
+          //   label: "Event_1",
+          //   action: "Action_1",
+          //   kind: KindDTO.INPUT_SEND,
+          //   initiator: "Alice",
+          //   typeExpr: { type: "Number" },
+          //   marking: {
+          //     hasExecuted: false,
+          //     isPending: true,
+          //     isIncluded: true,
+          //     value: { type: "Number", value: 1 }
+          //   },
+          //   timestamp: 0,
+          //   receivers: {
+          //     userVals: []
+          //   }
+          // },
           {
             id: "event1",
             label: "Event_1",
@@ -165,15 +177,53 @@ function MainApp() {
         );
       };
       
+      
       const handleConnect = (id: number) => {
         const row = rows.find((r) => r.id === id);
         if (row) {
-          alert(`Saved ${row.user} with value: ${row.ip}:${row.port}`);
+          // alert(`Saved ${row.user} with value: ${row.ip}:${row.port}`);
+          setCurrentRow(id);
+        handleClickOpen();
         }
       };
+      const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const formJson = Object.fromEntries((formData as any).entries());
+        const email = formJson.email;
+        console.log(email);
+        if (currentRow !== undefined) {
+          setCurrentRow(undefined);
+        }
+        handleClose();
+      };
+
     
     return ( <div>
-  
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Data</DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmit} id="subscription-form">
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              id="name"
+              name="email"
+              label="Email Address"
+              type="email"
+              fullWidth
+              variant="standard"
+            />
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button type="submit" form="subscription-form">
+            Subscribe
+          </Button>
+        </DialogActions>
+      </Dialog>
     <Container sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
         
