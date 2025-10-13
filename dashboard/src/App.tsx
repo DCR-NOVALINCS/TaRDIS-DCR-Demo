@@ -33,7 +33,7 @@ import logo from "./logo.png";
 import tardis_logo from "./tardis_logo.png";
 import { Provider } from "react-redux";
 import { store } from "./Store";
-import { getEvents } from "./Store/users";
+import { getEvents, stringFy } from "./Store/users";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import MainApp from "./Pages/MainPage";
 
@@ -96,14 +96,6 @@ const Toggle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-let stringFy = (self: SelfDTO): string => {
-  let params = self.params;
-  // map((param) => `${param.name}: ${param.value}`);
-  let paramsString = Object.entries(params)
-    .map(([key, value]) => `${key}: ${value.value}`)
-    .join(", ");
-  return `${self.role}(${paramsString})`;
-};
 
 const Header = ({
   self,

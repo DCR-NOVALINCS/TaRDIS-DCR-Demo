@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -7,30 +7,40 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TextField,
-  Button,
+  
   Typography,
   Container,
-  Stack,
-  Tab,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
-} from "@mui/material";
-import { DCREventDTO, KindDTO } from "../types/graph";
-import Event from "../components/Event";
-import DeleteIcon from '@mui/icons-material/Delete';
 
-interface RowData {
+  IconButton,
+
+} from "@mui/material";
+import { reconfiguration, stringFy, UserState } from "../Store/users";
+import { useAppDispatch, useUserSelector } from "../Store/hooks";
+import AddIcon from '@mui/icons-material/Add';
+import { UserConnectForm } from "../components/UserConnectForm";
+import { JSONForm } from "../components/JSONForm";
+import { UserEntry } from "../components/UserEntry";
+
+export interface RowData {
   id: number;
-  ip:string;
+  ip:String;
   port:number;
-  user: string;
-  events: DCREventDTO[];
+  self: string;
+  // events: DCREventDTO[];
 }
 
+const mapper = (users: Record<string,UserState>): RowData[] => {
+  var ret = Object.entries(users).map(([key, user], index) => {
+    return {
+      id: index,
+      ip: user.ip,
+      port: user.port,
+      self: user.self ? stringFy(user.self) : "Undefined",
+      // events: user.events
+    };
+  });
+  return ret;
+}
 
 // interface DCREventDTO {
 //     id: string;
@@ -47,203 +57,159 @@ interface RowData {
 function MainApp() {
   const [open, setOpen] = React.useState(false);
   const [currentRow, setCurrentRow] = React.useState<number| undefined>(undefined);
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  const [openSetUpForm, setOpenSetUpForm] = React.useState(false);
 
+  const [IP, setIP] = React.useState("localhost");
+  const [port, setPort] = React.useState(1234);
+  // const dispatch = useAppDispatch();
+
+  const handleCloseSetUpForm = () => {
+    setOpenSetUpForm(false);
+  }
   const handleClose = () => {
     setOpen(false);
   };
-    const [rows, setRows] = useState<RowData[]>([
-        { id: 1, ip:"localhost", port:1234, user: "Alice", events: [
-          {
-            id: "event1",
-            label: "Event_1",
-            action: "Action_1",
-            kind: KindDTO.INPUT_SEND,
-            initiator: "Alice",
-            typeExpr: { type: "Unit" },
-            marking: {
-              hasExecuted: false,
-              isPending: true,
-              isIncluded: true,
-              value: { type: "Unit", value: undefined }
-            },
-            timestamp: 0,
-            receivers: {
-              userVals: []
-            }
-          },
-          {
-            id: "event1",
-            label: "Event_1",
-            action: "Action_1",
-            kind: KindDTO.INPUT_SEND,
-            initiator: "Alice",
-            typeExpr: { type: "Unit" },
-            marking: {
-              hasExecuted: false,
-              isPending: true,
-              isIncluded: true,
-              value: { type: "Unit", value: undefined }
-            },
-            timestamp: 0,
-            receivers: {
-              userVals: []
-            }
-          },
-          // {
-          //   id: "event1",
-          //   label: "Event_1",
-          //   action: "Action_1",
-          //   kind: KindDTO.INPUT_SEND,
-          //   initiator: "Alice",
-          //   typeExpr: { type: "Number" },
-          //   marking: {
-          //     hasExecuted: false,
-          //     isPending: true,
-          //     isIncluded: true,
-          //     value: { type: "Number", value: 1 }
-          //   },
-          //   timestamp: 0,
-          //   receivers: {
-          //     userVals: []
-          //   }
-          // },
-          {
-            id: "event1",
-            label: "Event_1",
-            action: "Action_1",
-            kind: KindDTO.INPUT_SEND,
-            initiator: "Alice",
-            typeExpr: { type: "Unit" },
-            marking: {
-              hasExecuted: false,
-              isPending: true,
-              isIncluded: true,
-              value: { type: "Unit", value: undefined }
-            },
-            timestamp: 0,
-            receivers: {
-              userVals: []
-            }
-          },
-          {
-            id: "event1",
-            label: "Event_1",
-            action: "Action_1",
-            kind: KindDTO.INPUT_SEND,
-            initiator: "Alice",
-            typeExpr: { type: "Unit" },
-            marking: {
-              hasExecuted: false,
-              isPending: true,
-              isIncluded: true,
-              value: { type: "Unit", value: undefined }
-            },
-            timestamp: 0,
-            receivers: {
-              userVals: []
-            }
-          },
-          {
-            id: "event1",
-            label: "Event_1",
-            action: "Action_1",
-            kind: KindDTO.INPUT_SEND,
-            initiator: "Alice",
-            typeExpr: { type: "Unit" },
-            marking: {
-              hasExecuted: false,
-              isPending: true,
-              isIncluded: true,
-              value: { type: "Unit", value: undefined }
-            },
-            timestamp: 0,
-            receivers: {
-              userVals: []
-            }
-          }
-        ] },
-        { id: 2, ip:"localhost", port:1235, user: "Ze", events:[] },
-        // { id: 3, name: "Charlie", editableValue: "30" },
-      ]);
-    
-      const handleChange = (id: number, newValue: string) => {
-        setRows((prev) =>
-          prev.map((row) =>
-            row.id === id ? { ...row, editableValue: newValue } : row
-          )
-        );
-      };
-      
-      
-      const handleConnect = (id: number) => {
-        const row = rows.find((r) => r.id === id);
-        if (row) {
-          // alert(`Saved ${row.user} with value: ${row.ip}:${row.port}`);
-          setCurrentRow(id);
-        handleClickOpen();
-        }
-      };
-      const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const formJson = Object.fromEntries((formData as any).entries());
-        const email = formJson.email;
-        console.log(email);
-        if (currentRow !== undefined) {
-          setCurrentRow(undefined);
-        }
-        handleClose();
-      };
+    // const [rows, setRows] = useState<RowData[]>([
+    //     { id: 1, ip:"localhost", port:0, self: "Alice", events: [
+    //       {
+    //         id: "event1",
+    //         label: "Event_1",
+    //         action: "Action_1",
+    //         kind: KindDTO.INPUT_SEND,
+    //         initiator: "Alice",
+    //         typeExpr: { type: "Unit" },
+    //         marking: {
+    //           hasExecuted: false,
+    //           isPending: true,
+    //           isIncluded: true,
+    //           value: { type: "Unit", value: undefined }
+    //         },
+    //         timestamp: 0,
+    //         receivers: {
+    //           userVals: []
+    //         }
+    //       },
+    //       {
+    //         id: "event1",
+    //         label: "Event_1",
+    //         action: "Action_1",
+    //         kind: KindDTO.INPUT_SEND,
+    //         initiator: "Alice",
+    //         typeExpr: { type: "Unit" },
+    //         marking: {
+    //           hasExecuted: false,
+    //           isPending: true,
+    //           isIncluded: true,
+    //           value: { type: "Unit", value: undefined }
+    //         },
+    //         timestamp: 0,
+    //         receivers: {
+    //           userVals: []
+    //         }
+    //       },
+    //       {
+    //         id: "event1",
+    //         label: "Event_1",
+    //         action: "Action_1",
+    //         kind: KindDTO.INPUT_SEND,
+    //         initiator: "Alice",
+    //         typeExpr: { type: "Unit" },
+    //         marking: {
+    //           hasExecuted: false,
+    //           isPending: true,
+    //           isIncluded: true,
+    //           value: { type: "Unit", value: undefined }
+    //         },
+    //         timestamp: 0,
+    //         receivers: {
+    //           userVals: []
+    //         }
+    //       },
+    //       {
+    //         id: "event1",
+    //         label: "Event_1",
+    //         action: "Action_1",
+    //         kind: KindDTO.INPUT_SEND,
+    //         initiator: "Alice",
+    //         typeExpr: { type: "Unit" },
+    //         marking: {
+    //           hasExecuted: false,
+    //           isPending: true,
+    //           isIncluded: true,
+    //           value: { type: "Unit", value: undefined }
+    //         },
+    //         timestamp: 0,
+    //         receivers: {
+    //           userVals: []
+    //         }
+    //       },
+    //       {
+    //         id: "event1",
+    //         label: "Event_1",
+    //         action: "Action_1",
+    //         kind: KindDTO.INPUT_SEND,
+    //         initiator: "Alice",
+    //         typeExpr: { type: "Unit" },
+    //         marking: {
+    //           hasExecuted: false,
+    //           isPending: true,
+    //           isIncluded: true,
+    //           value: { type: "Unit", value: undefined }
+    //         },
+    //         timestamp: 0,
+    //         receivers: {
+    //           userVals: []
+    //         }
+    //       }
+    //     ] },
+    //     { id: 2, ip:"localhost", port:1235, self: "Ze", events:[] },
+    //     // { id: 3, name: "Charlie", editableValue: "30" },
+    //   ]);
+    const users = useUserSelector((state) => state.users);
+    const [rows, setRows] = useState<RowData[]>(mapper(users));
+    React.useEffect(() => {
+      setRows(mapper(users));
+    }, [users]);
+    //  useState<RowData[]>([]);
 
-    
+      // const handleChange = (id: number, newValue: string) => {
+       
+      // };
+    // const ip = useUserSelector((state) => state.ip);
+    // const port = useUserSelector((state) => state.port);
+    // useEffect(() => {
+      
+    //   //  setRows(mapper(users));
+    //    if (IP && port) {
+     
+    //    }
+    //  }, [IP,port]);
     return ( <div>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Data</DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSubmit} id="subscription-form">
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              id="name"
-              name="email"
-              label="Email Address"
-              type="email"
-              fullWidth
-              variant="standard"
-            />
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" form="subscription-form">
-            Subscribe
-          </Button>
-        </DialogActions>
-      </Dialog>
+    <UserConnectForm open={openSetUpForm} handleClose={handleCloseSetUpForm} rows={rows} setRows={setRows} setIP={setIP} setPort={setPort}/>
+    <JSONForm open={open} handleClose={handleClose} currentRow={currentRow} setCunrrentRow={setCurrentRow} rows={rows} />
     <Container sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
-        
       </Typography>
 
       <TableContainer component={Paper}>
-        <Button variant="contained" color="info" sx={{ m: 2 }}
+        <IconButton
+        //  variant="contained" 
+         color="info"
+          sx={{ m: 2 }}
           onClick={() => {
-            const newId = rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1;
-            setRows([...rows, { id: newId, ip: "localhost", port: 1234, user: "New User", events: [] }]);
-          }}
+            setOpenSetUpForm(true);
+            // const newId = rows.length > 0 ? Math.max(...rows.map((r) => r.id)) + 1 : 1;
+            // setRows((prev) => [...prev, { id: newId, ip: "localhost", port: 0, self: "Unknown", events: [] }]);
+          } }
         >
-          Add Row
-        </Button>
+          <AddIcon />
+        </IconButton>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Disconnect</TableCell>
-              <TableCell>IP (TextField)</TableCell>
-              <TableCell>Port (TextField)</TableCell>
+              <TableCell>IP </TableCell>
+              <TableCell>Port </TableCell>
               <TableCell>Actions</TableCell>
               <TableCell>User</TableCell>
               <TableCell>Events (Buttons)</TableCell>
@@ -253,103 +219,11 @@ function MainApp() {
           <TableBody  
           >
             {rows.map((row) => (
-              <TableRow key={row.id}>
-                  {/* Disconnect Button column */}
-                <TableCell>
-                  <IconButton
-                  // img= {"/disconnect_icon.png"}
-                    color="error"
-                    onClick={() => {
-                      setRows((prev) => prev.filter((r) => r.id !== row.id));
-                    }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-
-                {/* TextField column */}
-                <TableCell>
-                  <TextField
-                    value={row.ip}
-                    size="small"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleChange(row.id, e.target.value)
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.port}
-                    size="small"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setRows((prev) =>
-                          prev.map((rowList) =>
-                            rowList.id === row.id ? { ...rowList, port: Number.parseInt(e.target.value)} : row
-                          )
-                        )
-                    }
-                  />
-                </TableCell>
-          
-                {/* Button column */}
-                <TableCell>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleConnect(row.id)}
-                  >
-                    Connect
-                  </Button>
-                </TableCell>
-                 {/* Text column */}
-                 <TableCell>{row.user}</TableCell>
-
-                  {/* Events column */}
-                  <TableCell
-          // sx={{ width: "50%", overflow: "auto" }}
-          sx={{ maxWidth: 400, overflowX: "auto", p: 1 }}
-                  >
-                    {row.events.length === 0 ? (
-                      <Typography variant="body2" color="textSecondary">
-                        No events
-                        </Typography>
-                        ) : (
-                          <Stack
-                          direction="row"
-                        spacing={2}
-                        sx={{
-                          minWidth: "max-content",
-                          alignItems: "stretch",
-                          maxWidth: 400,
-                          overflowX: "auto",
-                          p: 1,
-                          "&::-webkit-scrollbar": { height: 6 },
-                          "&::-webkit-scrollbar-thumb": {
-                            backgroundColor: "#ccc",
-                            borderRadius: 3,
-                          },
-                        }}
-                        
-                        // sx={{ overflowX: "auto", p: 2, width: '100%' }}
-                        // useFlexGap={true} 
-                        // display={"flex"}
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                      
-                      {row.events.sort(
-                      ((a: DCREventDTO, b: DCREventDTO) =>{ 
-                        if (a.timestamp < b.timestamp) return -1;
-                        if (a.timestamp > b.timestamp) return 1;
-                        return 0;
-                      })).map((event: DCREventDTO) => {
-                              return <Event key={event.id} event={event}  />;
-                            })}
-                      </Stack>
-                    ) }
-
-                  </TableCell>
-              </TableRow>
+              <UserEntry row={row} rows={rows} 
+              setRows={setRows} setCurrentRow={setCurrentRow} 
+              setOpen={setOpen} ip={IP} port= {port}
+              setIP={setIP}
+              setPort={setPort}/> 
             ))}
           </TableBody>
         </Table>
