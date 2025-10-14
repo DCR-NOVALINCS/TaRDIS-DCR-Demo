@@ -5,8 +5,10 @@ import Event from "./Event";
 import { RowData } from "../Pages/MainPage";
 import { useAppDispatch, useUserSelector } from "../Store/hooks";
 import useWebSocket from "react-use-websocket";
-import { addUser, reconfiguration, ResponseDTO, setEvents } from "../Store/users";
+import { addUser, connectUser, getEvents, removeUser, ResponseDTO, setSelf } from "../Store/users";
 import { useEffect, useState } from "react";
+import { connect } from "http2";
+import { Draggable } from "@hello-pangea/dnd";
 
 
 
@@ -16,33 +18,51 @@ export const UserEntry = (props: {
   setRows: React.Dispatch<React.SetStateAction<RowData[]>>;
   setCurrentRow: (id: number | undefined) => void;
   setOpen: (open: boolean) => void;
-  setIP : React.Dispatch<React.SetStateAction<string>>;
-  setPort : React.Dispatch<React.SetStateAction<number>>;
-  ip : string;
-  port : number;
+  index: number;
+  // setIP : React.Dispatch<React.SetStateAction<string>>;
+  // setPort : React.Dispatch<React.SetStateAction<number>>;
+  // ip : string;
+  // port : number;
 }) => {
   const dispatch = useAppDispatch();
   // const ip = useUserSelector((state) => state.ip);
   // const port = useUserSelector((state) => state.port);
   // console.log("Rendering UserEntry for ", props.ip, props.port);
   const [event, setEvent]= useState<DCREventDTO[]>([]);
-  var userId = props.ip + ":" + props.port;
+  var userId = props.row.ip + ":" + props.row.port;
+      const userConnection = useUserSelector((state) => state.users[props.row.ip + ":" + props.row.port].connection);
   // var user = getState().usersStore.users[userId];
   const { sendMessage, lastMessage, readyState } = useWebSocket(`ws://${userId}/dcr`, {
     onOpen: () =>  {
-      dispatch(addUser({ ip: props.ip, port: props.port }));
-      console.log("opened connection to "+userId)
+      // dispatch(useAddUser({ ip: props.row.ip, port: props.row.port }));
+      console.log("WebSocket connection established for "+userId);
+      getEvents(`http://${userId}/rest/dcr/events/enabled`);  
+      // console.log("opened connection to "+userId)
     }
-,    //Will attempt to reconnect on all close events, such as server shutting down
+    
+    , //Will attempt to reconnect on all close events, such as server shutting down
     shouldReconnect: (closeEvent) => true,
+    
   });
 
-  
+  useEffect(() => {
+    if(readyState == WebSocket.OPEN ) {
+      if(!userConnection) {
+        dispatch(connectUser({ userId: userId, connect: true }));
+      }
+    }else if(readyState == WebSocket.CLOSED) {
+      // const userConnection = useUserSelector((state) => state.users[props.row.ip + ":" + props.row.port].connection);
+      if(userConnection) {
+        dispatch(removeUser(userId));
+      }
+    }
+  }, [readyState]);
+
   useEffect(() => {
     if (lastMessage !== null) {
       var message = JSON.parse(lastMessage.data) as ResponseDTO;
       // console.log("Received message from ", message);
-      dispatch(setEvents({ userId: userId, events: message }));
+      dispatch(setSelf({ userId: userId, events: message }));
       setEvent(message.events);
     }
   }, [lastMessage]);
@@ -62,7 +82,18 @@ export const UserEntry = (props: {
     props.setOpen(true);
   };
 
-  return (<TableRow key={props.row.id}>
+  return (
+  <Draggable key={props.row.ip+":"+ props.row.port} draggableId={props.row.ip+":"+ props.row.port} index={props.row.id}>
+                {(provided, snapshot) => (
+  <TableRow 
+    ref={provided.innerRef}
+    {...provided.draggableProps}
+    {...provided.dragHandleProps}
+    sx={{
+      backgroundColor: snapshot.isDragging ? 'action.hover' : 'inherit',
+      cursor: 'grab',
+    }}
+  key={props.row.id}>
     {/* Disconnect Button column */}
     <TableCell>
       <IconButton
@@ -73,7 +104,7 @@ export const UserEntry = (props: {
           if (rowC) {
             alert(`Disconnected ${rowC.self} with value: ${rowC.ip}:${rowC.port}`);
           }
-          // disconnectUser(row.ip+":"+row.port);
+          dispatch(removeUser(userId));
           props.setRows((prev) => prev.filter((r) => r.id !== props.row.id));
         }}
       >
@@ -166,11 +197,14 @@ export const UserEntry = (props: {
               if (a.timestamp > b.timestamp) return 1;
               return 0;
             })).map((event: DCREventDTO) => {
-              return <Event key={event.id} event={event} />;
+              return <Event key={event.id} event={event} targetPort={props.row.port} targetIp={props.row.ip}/>;
             })}
         </Stack>
       )}
 
     </TableCell>
-  </TableRow>);
+  </TableRow>
+   )}
+             </Draggable>
+             );
 };

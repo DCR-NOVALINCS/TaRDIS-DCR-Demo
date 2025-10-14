@@ -243,7 +243,7 @@ function MainApp2() {
             if (a.timestamp > b.timestamp) return 1;
             return 0;
           })).map((event: DCREventDTO) => {
-                  return <Event key={event.id} event={event}/>;
+                  return <Event key={event.id} event={event} targetIp={url} targetPort={port} />;
                 })}
           </Stack>
         )}

@@ -2,6 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } 
 // import { connectUser, setIP, setPort } from "../Store/users";
 import { useAppDispatch } from "../Store/hooks";
 import { RowData } from "../Pages/MainPage";
+import { addUser } from "../Store/users";
 
 
 
@@ -10,13 +11,16 @@ export const UserConnectForm = (props : {
   open: boolean;
   handleClose: () => void;
   rows: RowData[];
-  setIP : React.Dispatch<React.SetStateAction<string>>;
-  setPort : React.Dispatch<React.SetStateAction<number>>;
+  // setIP : React.Dispatch<React.SetStateAction<string>>;
+  // setPort : React.Dispatch<React.SetStateAction<number>>;
   setRows: React.Dispatch<React.SetStateAction<RowData[]>>;
   // handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 }) => {
     // const dispatch = useAppDispatch();
-    const { open, handleClose, setIP, setPort } = props;
+    const { open, handleClose, 
+      // setIP, setPort 
+    } = props;
+    const dispatch = useAppDispatch();
 
     // const closeForm = (ip:String, port: number) => {
     //   handleClose();
@@ -28,13 +32,16 @@ export const UserConnectForm = (props : {
         const ip = formData.get("IP")?.toString() || "localhost";
         const port = parseInt(formData.get("port")?.toString() || "1234");
         // console.log("Connecting to ", ip, port);  
-        setIP(ip);
-        setPort(port);
+        // dispatch(setIP(ip));
+        // dispatch(setPort(port));
+        // setIP(ip);
+        // setPort(port);
+        // closeForm(ip, port);
         const newId = props.rows.length > 0 ? Math.max(...props.rows.map((r) => r.id)) + 1 : 1;
         props.setRows((prev) =>
           // if (prev.filter((r) => r.ip !== ip || r.port !== port)).length === 0); 
-        [...prev, { id: newId, ip: ip, port: port, self: "Unknown", events: [] }]);
-        // closeForm(ip, port);
+        [...prev, { id: newId, ip: ip, port: port, self: "Unknown", events: [] , connection: false}]);
+        dispatch(addUser({ ip: ip, port: port }));
         handleClose();
     }
     return ( <Dialog open={open} onClose={handleClose}>

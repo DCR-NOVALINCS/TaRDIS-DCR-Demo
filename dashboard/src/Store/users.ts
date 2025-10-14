@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { DCREventDTO, SelfDTO, ValueDTO } from "../types/graph";
-import { AppDispatch, State as RootState } from "./index";
-import useWebSocket from "react-use-websocket";
 
 
 
@@ -10,6 +8,8 @@ export interface UserState {
     self: SelfDTO | undefined,
     ip: String,
     port: number,
+    connection: boolean,
+    indexTable: number
     // events: DCREventDTO[],
     // loading: boolean,
     // uploading: boolean,
@@ -20,7 +20,7 @@ export interface State {
     users: Record<string,UserState>;
     userFilter: SelfDTO | undefined;
     ip: String,
-    port: number,
+    port: number
     // size: number
 }
 // const initialState: State = {
@@ -57,20 +57,23 @@ export const slice = createSlice({
         setPort : (state, action: PayloadAction<number>) => {
           state.port = action.payload;
         },
-        setEvents: (state, action: PayloadAction<{userId:string, events:ResponseDTO}>) => {
+        setSelf: (state, action: PayloadAction<{userId:string, events:ResponseDTO}>) => {
           // console.log("Setting events for ", stringFy(action.payload.events.self));
           // console.log(action.payload.events);
           state.users[action.payload.userId].self = action.payload.events.self;
           // state.users[action.payload.userId].events = action.payload.events.events;
         }, 
-        // disconnect: (state, action: PayloadAction<string>) => {
-        //   state.users[action.payload].connection?.close();
-        //   delete state.users[action.payload];
-        // },
-        // reconfigure: (state, action) => {
-          // state.
-          // state.size++;
-        // },
+        removeUser: (state, action: PayloadAction<string>) => {
+          // state.users[action.payload].connection?.close();
+          delete state.users[action.payload];
+          Object.values(state.users)
+        .sort((a, b) => a.indexTable - b.indexTable)
+        .forEach((u, i) => (u.indexTable = i));
+        },
+        connectUser: (state, action: PayloadAction<{userId:string, connect: boolean}>) => {
+          state.users[action.payload.userId].connection = action.payload.connect;
+        },
+        
         addUser: (state, action: PayloadAction<{ip: String, port: number}>) => {
           var userId = action.payload.ip+":"+action.payload.port; 
           if (!(userId in state.users)) {
@@ -78,16 +81,24 @@ export const slice = createSlice({
               self: undefined,
               ip: action.payload.ip,
               port: action.payload.port,
+              connection: false,
+              indexTable: Object.keys(state.users).length
               // events: [],
               // connection: undefined
             }
             // state.size++;
           }
-        }
+        },
+        reorderUsers: (state, action: PayloadAction<{ startIndex: number; endIndex: number }>) => {
+          const ordered = Object.values(state.users).sort((a, b) => a.indexTable - b.indexTable);
+          const [moved] = ordered.splice(action.payload.startIndex, 1);
+          ordered.splice(action.payload.endIndex, 0, moved);
+          ordered.forEach((u, i) => (state.users[u.ip + ":" + u.port].indexTable = i));
+        },
     }
 })
 
-export const {setEvents,setIP, setPort, addUser} = slice.actions
+export const {setSelf,setIP, setPort,  addUser,removeUser, connectUser, reorderUsers} = slice.actions
 
 export default slice.reducer
 

@@ -14,7 +14,8 @@ import {
   IconButton,
 
 } from "@mui/material";
-import { reconfiguration, stringFy, UserState } from "../Store/users";
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { reconfiguration, reorderUsers, stringFy, UserState } from "../Store/users";
 import { useAppDispatch, useUserSelector } from "../Store/hooks";
 import AddIcon from '@mui/icons-material/Add';
 import { UserConnectForm } from "../components/UserConnectForm";
@@ -26,41 +27,32 @@ export interface RowData {
   ip:String;
   port:number;
   self: string;
+  connection: boolean;
   // events: DCREventDTO[];
 }
 
 const mapper = (users: Record<string,UserState>): RowData[] => {
+  // console.log("Mapping users", users);
   var ret = Object.entries(users).map(([key, user], index) => {
     return {
-      id: index,
+      id: user.indexTable,
       ip: user.ip,
       port: user.port,
       self: user.self ? stringFy(user.self) : "Undefined",
+      connection: user.connection,
       // events: user.events
     };
   });
   return ret;
 }
 
-// interface DCREventDTO {
-//     id: string;
-//     label:string;
-//     action: string;
-//     kind: KindDTO;
-//     initiator: string;
-//     typeExpr: TypeDTO;
-//     marking: MarkingDTO;
-//     timestamp: number;
-//     receivers: UserSetValDTO;
-// }
-
 function MainApp() {
   const [open, setOpen] = React.useState(false);
   const [currentRow, setCurrentRow] = React.useState<number| undefined>(undefined);
   const [openSetUpForm, setOpenSetUpForm] = React.useState(false);
 
-  const [IP, setIP] = React.useState("localhost");
-  const [port, setPort] = React.useState(1234);
+  // const [IP, setIP] = React.useState("localhost");
+  // const [port, setPort] = React.useState(1234);
   // const dispatch = useAppDispatch();
 
   const handleCloseSetUpForm = () => {
@@ -69,123 +61,23 @@ function MainApp() {
   const handleClose = () => {
     setOpen(false);
   };
-    // const [rows, setRows] = useState<RowData[]>([
-    //     { id: 1, ip:"localhost", port:0, self: "Alice", events: [
-    //       {
-    //         id: "event1",
-    //         label: "Event_1",
-    //         action: "Action_1",
-    //         kind: KindDTO.INPUT_SEND,
-    //         initiator: "Alice",
-    //         typeExpr: { type: "Unit" },
-    //         marking: {
-    //           hasExecuted: false,
-    //           isPending: true,
-    //           isIncluded: true,
-    //           value: { type: "Unit", value: undefined }
-    //         },
-    //         timestamp: 0,
-    //         receivers: {
-    //           userVals: []
-    //         }
-    //       },
-    //       {
-    //         id: "event1",
-    //         label: "Event_1",
-    //         action: "Action_1",
-    //         kind: KindDTO.INPUT_SEND,
-    //         initiator: "Alice",
-    //         typeExpr: { type: "Unit" },
-    //         marking: {
-    //           hasExecuted: false,
-    //           isPending: true,
-    //           isIncluded: true,
-    //           value: { type: "Unit", value: undefined }
-    //         },
-    //         timestamp: 0,
-    //         receivers: {
-    //           userVals: []
-    //         }
-    //       },
-    //       {
-    //         id: "event1",
-    //         label: "Event_1",
-    //         action: "Action_1",
-    //         kind: KindDTO.INPUT_SEND,
-    //         initiator: "Alice",
-    //         typeExpr: { type: "Unit" },
-    //         marking: {
-    //           hasExecuted: false,
-    //           isPending: true,
-    //           isIncluded: true,
-    //           value: { type: "Unit", value: undefined }
-    //         },
-    //         timestamp: 0,
-    //         receivers: {
-    //           userVals: []
-    //         }
-    //       },
-    //       {
-    //         id: "event1",
-    //         label: "Event_1",
-    //         action: "Action_1",
-    //         kind: KindDTO.INPUT_SEND,
-    //         initiator: "Alice",
-    //         typeExpr: { type: "Unit" },
-    //         marking: {
-    //           hasExecuted: false,
-    //           isPending: true,
-    //           isIncluded: true,
-    //           value: { type: "Unit", value: undefined }
-    //         },
-    //         timestamp: 0,
-    //         receivers: {
-    //           userVals: []
-    //         }
-    //       },
-    //       {
-    //         id: "event1",
-    //         label: "Event_1",
-    //         action: "Action_1",
-    //         kind: KindDTO.INPUT_SEND,
-    //         initiator: "Alice",
-    //         typeExpr: { type: "Unit" },
-    //         marking: {
-    //           hasExecuted: false,
-    //           isPending: true,
-    //           isIncluded: true,
-    //           value: { type: "Unit", value: undefined }
-    //         },
-    //         timestamp: 0,
-    //         receivers: {
-    //           userVals: []
-    //         }
-    //       }
-    //     ] },
-    //     { id: 2, ip:"localhost", port:1235, self: "Ze", events:[] },
-    //     // { id: 3, name: "Charlie", editableValue: "30" },
-    //   ]);
+  const dispatch = useAppDispatch();
     const users = useUserSelector((state) => state.users);
     const [rows, setRows] = useState<RowData[]>(mapper(users));
     React.useEffect(() => {
-      setRows(mapper(users));
+      setRows(mapper(users).sort((a, b) => a.id - b.id));
     }, [users]);
-    //  useState<RowData[]>([]);
+  
 
-      // const handleChange = (id: number, newValue: string) => {
-       
-      // };
-    // const ip = useUserSelector((state) => state.ip);
-    // const port = useUserSelector((state) => state.port);
-    // useEffect(() => {
-      
-    //   //  setRows(mapper(users));
-    //    if (IP && port) {
-     
-    //    }
-    //  }, [IP,port]);
+    const handleDragEnd = (result: DropResult) => {
+      if (!result.destination) return;
+      const { source, destination } = result;
+      if (source.index !== destination.index) {
+        dispatch(reorderUsers({ startIndex: source.index, endIndex: destination.index }));
+      }
+    };
     return ( <div>
-    <UserConnectForm open={openSetUpForm} handleClose={handleCloseSetUpForm} rows={rows} setRows={setRows} setIP={setIP} setPort={setPort}/>
+    <UserConnectForm open={openSetUpForm} handleClose={handleCloseSetUpForm} rows={rows} setRows={setRows}/>
     <JSONForm open={open} handleClose={handleClose} currentRow={currentRow} setCunrrentRow={setCurrentRow} rows={rows} />
     <Container sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
@@ -204,7 +96,10 @@ function MainApp() {
         >
           <AddIcon />
         </IconButton>
-        <Table>
+        <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="usersTable">
+          {(provided) => (
+        <Table {...provided.droppableProps} ref={provided.innerRef}>
           <TableHead>
             <TableRow>
               <TableCell>Disconnect</TableCell>
@@ -218,15 +113,23 @@ function MainApp() {
 
           <TableBody  
           >
-            {rows.map((row) => (
-              <UserEntry row={row} rows={rows} 
-              setRows={setRows} setCurrentRow={setCurrentRow} 
-              setOpen={setOpen} ip={IP} port= {port}
-              setIP={setIP}
-              setPort={setPort}/> 
-            ))}
+            {rows.map((row, index) => (
+                <UserEntry row={row} rows={rows} 
+                setRows={setRows} setCurrentRow={setCurrentRow} 
+                setOpen={setOpen}
+                index={index}
+                //  ip={IP} port= {port}
+                // setIP={setIP}
+                // setPort={setPort}
+                /> 
+           
+             ))}
+               {provided.placeholder}
           </TableBody>
         </Table>
+        )}
+        </Droppable>
+        </DragDropContext>
       </TableContainer>
     </Container>
 

@@ -25,8 +25,8 @@ const url = window.location.hostname; //FIXME: This should not be here
 
 type EventProps = {
   event: DCREventDTO;
-  // targetPort: number;
-  // targetIp: string
+  targetPort: number;
+  targetIp: String
 };
 
 const convertFormDataIntoValue = (
@@ -93,9 +93,12 @@ const ComputationEvent = ({ event }: { event: DCREventDTO }) => (
 
 const InputEvent = ({
   event,
- 
+  ip,
+  port
 }: {
   event: DCREventDTO;
+  ip: String;
+  port: number
 }) => {
   const [showSnackbar, setShowSnackbar] = React.useState<boolean>(false);
 
@@ -103,17 +106,14 @@ const InputEvent = ({
     SnackMessage | undefined
   >(undefined);
 
-  // console.log("InputEvent", event);
   const executeInput = (formEvent: React.FormEvent<HTMLFormElement>) => {
     formEvent.preventDefault();
     const formData = new FormData(formEvent.currentTarget);
-    // const formJson = Object.fromEntries((formData as any).entries());
-    // console.log("Form data", formData);
     let value = convertFormDataIntoValue(formData, event.typeExpr);
     let body = { eventID: event.id, value: value };
     console.log("Executing input event", body);
     executeEvent(
-      `http://${url}:${1234}/rest/dcr/events/${event.action}/${event.id}`,
+      `http://${ip}:${port}/rest/dcr/events/${event.action}/${event.id}`,
       body
     ).catch((error) => {
       console.error(error);
@@ -179,7 +179,7 @@ const Receivers = ({event}: {event: DCREventDTO}) => {
     </div>
   );
 }
-export default function Event({ event }: EventProps) {
+export default function Event({ event,targetIp,targetPort }: EventProps) {
   // console.log ( KindDTO[event.kind] === KindDTO.INPUT_SEND );
   // console.log("Event", event.marking);
   return (
@@ -204,7 +204,7 @@ export default function Event({ event }: EventProps) {
         )}
         {(event.kind === KindDTO.INPUT ||
           event.kind === KindDTO.INPUT_SEND) && (
-          <InputEvent event={event}  />
+          <InputEvent event={event} ip={targetIp} port={targetPort} />
         )}
       </CardContent>
     </Card>
