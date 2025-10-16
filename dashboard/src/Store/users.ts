@@ -4,24 +4,26 @@ import { DCREventDTO, SelfDTO, ValueDTO } from "../types/graph";
 
 
 export interface UserState {
-    // id: number,
-    self: SelfDTO | undefined,
-    ip: String,
-    port: number,
-    connection: boolean,
-    indexTable: number
-    // events: DCREventDTO[],
-    // loading: boolean,
-    // uploading: boolean,
-    // connection: WebSocket | undefined
+  // id: number,
+  self: SelfDTO | undefined,
+  ip: String,
+  port: number,
+  connection: boolean,
+  // indexTable: number
+  // events: DCREventDTO[],
+  // loading: boolean,
+  // uploading: boolean,
+  // connection: WebSocket | undefined
 }
 
 export interface State {
-    users: Record<string,UserState>;
-    userFilter: SelfDTO | undefined;
-    ip: String,
-    port: number
-    // size: number
+  // users: Record<string,UserState>;
+
+  users: Array<UserState>;
+  userFilter: SelfDTO | undefined;
+  ip: String,
+  port: number
+  // size: number
 }
 // const initialState: State = {
 //     self: undefined,
@@ -32,73 +34,103 @@ export interface State {
 //     uploading: false
 // }
 const initialState: State = {
-    users: {},
-    userFilter: undefined,
-    ip: "localhost",
-    port: 1234,
-    // size:0
+  users: [],
+  userFilter: undefined,
+  ip: "localhost",
+  port: 1234,
+  // size:0
 }
 
-export interface ResponseDTO{
-    self: SelfDTO;
-    events: DCREventDTO[];
+export interface ResponseDTO {
+  self: SelfDTO;
+  events: DCREventDTO[];
 }
 
 export const slice = createSlice({
-    name:"users",
-    initialState,
-    reducers: {
-        // connect: (state, action: PayloadAction<{ userId: string; socket: WebSocket }>) => {
-        //   state.users[action.payload.userId].connection = action.payload.socket;
-        // },
-        setIP : (state, action: PayloadAction<String>) => {
-          state.ip = action.payload;
-        },
-        setPort : (state, action: PayloadAction<number>) => {
-          state.port = action.payload;
-        },
-        setSelf: (state, action: PayloadAction<{userId:string, events:ResponseDTO}>) => {
-          // console.log("Setting events for ", stringFy(action.payload.events.self));
-          // console.log(action.payload.events);
-          state.users[action.payload.userId].self = action.payload.events.self;
-          // state.users[action.payload.userId].events = action.payload.events.events;
-        }, 
-        removeUser: (state, action: PayloadAction<string>) => {
-          // state.users[action.payload].connection?.close();
-          delete state.users[action.payload];
-          Object.values(state.users)
-        .sort((a, b) => a.indexTable - b.indexTable)
-        .forEach((u, i) => (u.indexTable = i));
-        },
-        connectUser: (state, action: PayloadAction<{userId:string, connect: boolean}>) => {
-          state.users[action.payload.userId].connection = action.payload.connect;
-        },
-        
-        addUser: (state, action: PayloadAction<{ip: String, port: number}>) => {
-          var userId = action.payload.ip+":"+action.payload.port; 
-          if (!(userId in state.users)) {
-            state.users[userId] = {
-              self: undefined,
-              ip: action.payload.ip,
-              port: action.payload.port,
-              connection: false,
-              indexTable: Object.keys(state.users).length
-              // events: [],
-              // connection: undefined
-            }
-            // state.size++;
-          }
-        },
-        reorderUsers: (state, action: PayloadAction<{ startIndex: number; endIndex: number }>) => {
-          const ordered = Object.values(state.users).sort((a, b) => a.indexTable - b.indexTable);
-          const [moved] = ordered.splice(action.payload.startIndex, 1);
-          ordered.splice(action.payload.endIndex, 0, moved);
-          ordered.forEach((u, i) => (state.users[u.ip + ":" + u.port].indexTable = i));
-        },
-    }
+  name: "users",
+  initialState,
+  reducers: {
+    // connect: (state, action: PayloadAction<{ userId: string; socket: WebSocket }>) => {
+    //   state.users[action.payload.userId].connection = action.payload.socket;
+    // },
+    setIP: (state, action: PayloadAction<String>) => {
+      state.ip = action.payload;
+    },
+    setPort: (state, action: PayloadAction<number>) => {
+      state.port = action.payload;
+    },
+    setSelf: (state, action: PayloadAction<{ userId: string, events: ResponseDTO }>) => {
+      // console.log("Setting events for ", stringFy(action.payload.events.self));
+      // console.log(action.payload.events);
+      // state.users[action.payload.userId].self = action.payload.events.self;
+      state.users.find(u => u.ip + ":" + u.port === action.payload.userId)!.self = action.payload.events.self;
+
+    },
+    setUserIPPort(state, action: PayloadAction<{ userId: string, ip: String, port: number }>) {
+      // state.users[action.payload.userId].ip = action.payload.ip;
+      var user = state.users.find(u => u.ip + ":" + u.port === action.payload.userId);
+      if (user) {
+        user.ip = action.payload.ip;
+        user.port = action.payload.port;
+      }
+    },
+    removeUser: (state, action: PayloadAction<string>) => {
+      // state.users[action.payload].connection?.close();
+      // delete state.users[action.payload];
+      var user = state.users.find(u => u.ip + ":" + u.port === action.payload);
+      state.users = state.users.filter(u => u.ip + ":" + u.port !== action.payload);
+      // delete state.users[user];
+      //   Object.values(state.users)
+      // .sort((a, b) => a.indexTable - b.indexTable)
+      // .forEach((u, i) => (u.indexTable = i));
+    },
+    connectUser: (state, action: PayloadAction<{ userId: string, connect: boolean }>) => {
+      var user = state.users.find(u => u.ip + ":" + u.port === action.payload.userId);
+      if (!user) {
+        addUser({ ip: action.payload.userId.split(":")[0], port: parseInt(action.payload.userId.split(":")[1]) });
+      } else {
+        user!.connection = action.payload.connect;
+      }
+
+      // state.users[action.payload.userId].connection = action.payload.connect;
+    },
+
+    addUser: (state, action: PayloadAction<{ ip: String, port: number }>) => {
+      var userId = action.payload.ip + ":" + action.payload.port;
+      if (!(userId in state.users)) {
+        state.users.push({
+          self: undefined,
+          ip: action.payload.ip,
+          port: action.payload.port,
+          connection: false,
+          // indexTable: state.users.length
+        });
+        //
+
+        // state.users[userId] = {
+        //   self: undefined,
+        //   ip: action.payload.ip,
+        //   port: action.payload.port,
+        //   connection: false,
+        //   indexTable: Object.keys(state.users).length
+        //   // events: [],
+        //   // connection: undefined
+        // }
+        // state.size++;
+      }
+    },
+    reorderUsers: (state, action: PayloadAction<{ startIndex: number; endIndex: number }>) => {
+      // const ordered = Object.values(state.users).sort((a, b) => a.indexTable - b.indexTable);
+      // const [moved] = ordered.splice(action.payload.startIndex, 1);
+      // ordered.splice(action.payload.endIndex, 0, moved);
+      // ordered.forEach((u, i) => (state.users[u.ip + ":" + u.port].indexTable = i));
+      const [moved] = state.users.splice(action.payload.startIndex, 1);
+      state.users.splice(action.payload.endIndex, 0, moved);
+    },
+  }
 })
 
-export const {setSelf,setIP, setPort,  addUser,removeUser, connectUser, reorderUsers} = slice.actions
+export const { setSelf, setIP, setUserIPPort, setPort, addUser, removeUser, connectUser, reorderUsers } = slice.actions
 
 export default slice.reducer
 
@@ -123,7 +155,7 @@ export async function reconfiguration(userIP: string, json: string) {
       console.error('Error:', error);
     });
 }
-export async function executeEvent(url: string, value:any) {
+export async function executeEvent(url: string, value: any) {
   console.log("Executing event ", url, value);
   return await fetch(url, {
     method: 'PUT', // or 'PUT',
@@ -139,15 +171,15 @@ export async function executeEvent(url: string, value:any) {
       console.log('Success:', data.text());
     })
     .catch((error) => {
-    console.error('Error:', error);
-  });
+      console.error('Error:', error);
+    });
 }
 
 export async function getEvents(url: string) {
   return await fetch(url, {
     method: 'GET',
     mode: 'no-cors', // Add this line to enable CORS
-     })
+  })
 }
 
 export const stringFy = (self: SelfDTO): string => {
