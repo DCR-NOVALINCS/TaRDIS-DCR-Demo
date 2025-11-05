@@ -10,3 +10,7 @@
 	path = TaRDIS-DCR-Runtime
 	url = https://codelab.fct.unl.pt/di/research/tardis/wp3/TaRDIS-DCR-Runtime
 	ignore = dirty
+[submodule "TaRDIS-DCR-Dashboard"]
+	path = TaRDIS-DCR-Dashboard
+	url = https://codelab.fct.unl.pt/di/research/tardis/wp3/tardis-dcr-dashboard
+	ignore = dirty
