@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
+
 CONFIG_FILE="$HOME/.config/tardis-demo/participant.cfg"
 BABEL_SERVICE_PATH="$HOME/.config/systemd/user/tardis-demo-babel.service"
 GPIO_SERVICE_PATH="$HOME/.config/systemd/user/tardis-demo-gpio.service"
@@ -38,23 +41,16 @@ done
 babel_params="$(echo -e "$babel_params" | sed -e 's/^[[:space:]]*//')"
 py_gpio_params="--type ${config["role"]}"
 
-
-#printf "%s\n" "$py_gpio_params"
-#printf "%s\n" "$babel_params"
-
 cat tardis-demo-babel.service.template | sed "s/<PARTICIPANT-PARAMS>/$babel_params/g" > tardis-demo-babel.service
 cat tardis-demo-gpio.service.template | sed "s/<PARAMS>/$py_gpio_params/g" > tardis-demo-gpio.service
 
-
 mv tardis-demo-babel.service $BABEL_SERVICE_PATH
 mv tardis-demo-gpio.service $GPIO_SERVICE_PATH
-
 systemctl --user daemon-reload
+
+cd .. && mvn clean package -U && cd -
+
 systemctl --user enable --now tardis-demo-babel.service
 systemctl --user enable --now tardis-demo-gpio.service
-
-#mv tardis-demo-gpio.service /usr/local/bin/tardis-demo-gpio.service
-#mv tardis-demo-gpio.service ~/.config/systemd/user/tardis-demo-gpio.service
-#mv tardis-demo-gpio.service ~/.config/systemd/user/tardis-demo-babel.service
 
 echo "Install completed."
