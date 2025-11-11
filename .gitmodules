@@ -17,3 +17,4 @@
 [submodule "tardis-dcr-button-pi"]
 	path = tardis-dcr-button-pi
 	url = https://codelab.fct.unl.pt/di/research/tardis/wp3/tardis-dcr-button-pi
+	ignore = dirty
