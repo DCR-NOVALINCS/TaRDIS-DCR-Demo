@@ -2,19 +2,24 @@
 	path = TaRDIS-DCR-Editor
 	url = https://codelab.fct.unl.pt/di/research/tardis/wp3/TaRDIS-DCR-Editor
 	ignore = dirty
+	branch = main
 [submodule "TaRDIS-DCR-Compiler"]
 	path = TaRDIS-DCR-Compiler
 	url = https://codelab.fct.unl.pt/di/research/tardis/wp3/TaRDIS-DCR-Compiler
 	ignore = dirty
+	branch = main
 [submodule "TaRDIS-DCR-Runtime"]
 	path = TaRDIS-DCR-Runtime
 	url = https://codelab.fct.unl.pt/di/research/tardis/wp3/TaRDIS-DCR-Runtime
 	ignore = dirty
+	branch = main
 [submodule "TaRDIS-DCR-Dashboard"]
 	path = tardis-dcr-dashboard
 	url = https://codelab.fct.unl.pt/di/research/tardis/wp3/tardis-dcr-dashboard
 	ignore = dirty
+	branch = main
 [submodule "tardis-dcr-button-pi"]
 	path = tardis-dcr-button-pi
 	url = https://codelab.fct.unl.pt/di/research/tardis/wp3/tardis-dcr-button-pi
 	ignore = dirty
+	branch = main
