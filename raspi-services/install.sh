@@ -48,7 +48,7 @@ mv tardis-demo-babel.service $BABEL_SERVICE_PATH
 mv tardis-demo-gpio.service $GPIO_SERVICE_PATH
 systemctl --user daemon-reload
 
-cd ../TaRDIS.DCR-Runtime && mvn clean package -U && cd -
+cd ../TaRDISi-DCR-Runtime && mvn clean package -U && cd -
 
 systemctl --user enable --now tardis-demo-babel.service
 systemctl --user enable --now tardis-demo-gpio.service
