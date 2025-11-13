@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
 
-scriptdir="$(dirname "$0")"
-cd "$scriptdir"
-
 CONFIG_FILE="$HOME/.config/tardis-demo/participant.cfg"
 BABEL_SERVICE_PATH="$HOME/.config/systemd/user/tardis-demo-babel.service"
 GPIO_SERVICE_PATH="$HOME/.config/systemd/user/tardis-demo-gpio.service"
 TARDIS_DEMO_SLICE_PATH="$HOME/.config/systemd/user/tardis-demo.slice"
 
+MVN_CLEAN_PACKAGE=false
 
-# mandatory arg setting the role installed in this pi (Community Orchestrator or Prosumer only)
-#if [[ $# -ne 1 || ( "$1" != "P" && "$1" != "CO" ) ]]; then
-#    echo "Usage: ./install.sh {P|CO}"
-#    exit 1
-#fi
+while getopts 'u' OPTION; do
+    case "$OPTION" in
+        u) MVN_CLEAN_PACKAGE=true;;
+        ?) echo "Usage: $(basename $0) [-u] "; exit 1;;
+    esac
+done
+
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
 
 # to hold participant config
 declare -A config
@@ -32,10 +34,7 @@ parse_config
 # build param string
 babel_params=""
 for x in "${!config[@]}"; do 
-    #babel_param="$x=${config[$x]}"
     babel_params+=" $x=${config[$x]}"
-    #printf "%s\n" "$babel_param"
-    #printf "%s=%s\n" "$x" "${config[$x]}" 
 done
 
 babel_params="$(echo -e "$babel_params" | sed -e 's/^[[:space:]]*//')"
@@ -48,7 +47,9 @@ mv tardis-demo-babel.service $BABEL_SERVICE_PATH
 mv tardis-demo-gpio.service $GPIO_SERVICE_PATH
 systemctl --user daemon-reload
 
-cd ../TaRDIS-DCR-Runtime && mvn clean package -U && cd -
+if $MVN_CLEAN_PACKAGE; then
+    cd ../TaRDIS-DCR-Runtime && mvn clean package -U && cd -
+fi
 
 systemctl --user enable --now tardis-demo-babel.service
 systemctl --user enable --now tardis-demo-gpio.service
