@@ -3,7 +3,6 @@
 CONFIG_FILE="$HOME/.config/tardis-demo/participant.cfg"
 BABEL_SERVICE_PATH="$HOME/.config/systemd/user/tardis-demo-babel.service"
 GPIO_SERVICE_PATH="$HOME/.config/systemd/user/tardis-demo-gpio.service"
-TARDIS_DEMO_SLICE_PATH="$HOME/.config/systemd/user/tardis-demo.slice"
 
 MVN_CLEAN_PACKAGE=false
 
