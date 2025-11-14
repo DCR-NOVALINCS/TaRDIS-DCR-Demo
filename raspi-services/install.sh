@@ -39,17 +39,24 @@ done
 babel_params="$(echo -e "$babel_params" | sed -e 's/^[[:space:]]*//')"
 py_gpio_params="--type ${config["role"]}"
 
+# remove previous installation
+./uninstall.sh
+
+# instantiate services for this node (participant-dependent)
 cat tardis-demo-babel.service.template | sed "s/<PARTICIPANT-PARAMS>/$babel_params/g" > tardis-demo-babel.service
 cat tardis-demo-gpio.service.template | sed "s/<PARAMS>/$py_gpio_params/g" > tardis-demo-gpio.service
 
+# move instantiated services to proper path and refresh systemctl info
 mv tardis-demo-babel.service $BABEL_SERVICE_PATH
 mv tardis-demo-gpio.service $GPIO_SERVICE_PATH
 systemctl --user daemon-reload
 
+# re-build .jar if requested
 if $MVN_CLEAN_PACKAGE; then
     cd ../TaRDIS-DCR-Runtime && mvn clean package -U && cd -
 fi
 
+# start services now
 systemctl --user enable --now tardis-demo-babel.service
 systemctl --user enable --now tardis-demo-gpio.service
 

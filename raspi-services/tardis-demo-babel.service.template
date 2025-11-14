@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/bin/java -jar -DlogFileName="tardis-demo-babel" %h/TaRDIS-DCR-Demo/TaRDIS-DCR-Runtime/dist/babel-backend.jar interface=wlan0 <PARTICIPANT-PARAMS>
+ExecStart=/usr/bin/java -jar -DlogFileName="tardis-demo-babel" %h/TaRDIS-DCR-Demo/TaRDIS-DCR-Runtime/target/babel-backend.jar interface=wlan0 <PARTICIPANT-PARAMS>
 WorkingDirectory=%h
 StandardOutput=file:%h/tardis-demo-babel.log
 

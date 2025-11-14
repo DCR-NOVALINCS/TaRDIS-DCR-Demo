@@ -10,3 +10,5 @@ systemctl --user disable --now tardis-demo-babel.service
 rm ~/.config/systemd/user/tardis-demo-babel.service
 rm ~/.config/systemd/user/tardis-demo-gpio.service
 rm -rf ../tardis-dcr-button-pi/src/__pycache__
+rm ~/tardis-demo-babel.log
+rm ~/tardis-demo-gpio.log
