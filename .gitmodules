@@ -23,3 +23,6 @@
 	url = https://codelab.fct.unl.pt/di/research/tardis/wp3/tardis-dcr-button-pi
 	ignore = dirty
 	branch = main
+[submodule "TaRDIS-DCR-Examples"]
+	path = TaRDIS-DCR-Examples
+	url = https://codelab.fct.unl.pt/di/research/tardis/wp3/TaRDIS-DCR-Examples
